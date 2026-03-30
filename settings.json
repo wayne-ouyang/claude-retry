@@ -1,0 +1,31 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "python3 $CLAUDE_PLUGIN_DIR/scripts/statusline.py",
+    "padding": 0
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $CLAUDE_PLUGIN_DIR/scripts/on_stop.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 $CLAUDE_PLUGIN_DIR/scripts/on_session_start.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

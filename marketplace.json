@@ -1,0 +1,19 @@
+{
+  "name": "retry-guardian",
+  "owner": { "name": "retry-guardian" },
+  "metadata": {
+    "description": "Auto-retries on API errors via Stop hook. Live statusline HUD: model, context, cost, git branch, retry health.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "retry-guardian",
+      "description": "Detects API errors in the transcript and automatically retries by blocking Stop. Includes a live statusline HUD showing model, context bar, cost, git branch, and retry status.",
+      "version": "1.0.0",
+      "author": { "name": "retry-guardian" },
+      "source": "./plugins/retry-guardian",
+      "category": "utilities",
+      "keywords": ["retry", "api-error", "stopfailure", "statusline", "resilience"]
+    }
+  ]
+}
