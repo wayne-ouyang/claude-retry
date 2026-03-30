@@ -6,24 +6,32 @@ No wrapper script needed — hooks directly into Claude Code's event system. Whe
 
 ## Install
 
-Install via the Claude Code CLI:
+Inside a Claude Code instance, run the following commands:
 
-```bash
-claude plugin add https://github.com/wayne-ouyang/claude-retry
+**Step 1: Add the marketplace**
+
+```
+/plugin marketplace add wayne-ouyang/claude-retry
 ```
 
-That's it. The plugin activates automatically on your next session.
+**Step 2: Install the plugin**
+
+```
+/plugin install claude-retry
+```
+
+The plugin activates automatically on your next session.
 
 To verify it's installed:
 
-```bash
-claude plugin list
+```
+/plugin list
 ```
 
 To uninstall:
 
-```bash
-claude plugin remove claude-retry
+```
+/plugin remove claude-retry
 ```
 
 ## How It Works
