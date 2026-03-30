@@ -20,7 +20,11 @@ Inside a Claude Code instance, run the following commands:
 /plugin install claude-retry
 ```
 
-The plugin activates automatically on your next session.
+The plugin activates automatically on your next session. To activate it in the current session without restarting, run:
+
+```
+/reload-plugins
+```
 
 To verify it's installed:
 
