@@ -11,7 +11,6 @@
     {
       "name": "claude-retry",
       "description": "Detects API errors in the session transcript and automatically retries by blocking the Stop event with exponential backoff. No wrapper script needed.",
-      "version": "1.0.2",
       "author": {
         "name": "claude-retry"
       },

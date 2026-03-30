@@ -1,0 +1,8 @@
+__pycache__
+my_env
+data
+.venv
+*.log
+
+.claude/settings.local.json
+.worktrees

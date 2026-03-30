@@ -5,10 +5,24 @@ import time
 from pathlib import Path
 
 DATA_DIR = Path.home() / ".claude" / "claude-retry"
+LOG_PATH = DATA_DIR / "retry.log"
+
+_dir_ready = False
 
 
 def _ensure():
+    global _dir_ready
+    if _dir_ready:
+        return
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    _dir_ready = True
+
+
+def log(msg: str):
+    _ensure()
+    ts = time.strftime("%Y-%m-%dT%H:%M:%S")
+    with open(LOG_PATH, "a") as f:
+        f.write(f"[{ts}] {msg}\n")
 
 
 def _path():
