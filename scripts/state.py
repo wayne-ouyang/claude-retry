@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Shared state store — ~/.claude/retry-guardian/state.json"""
+"""Shared state store — ~/.claude/claude-retry/state.json"""
 import json
 import time
 from pathlib import Path
 
-DATA_DIR = Path.home() / ".claude" / "retry-guardian"
+DATA_DIR = Path.home() / ".claude" / "claude-retry"
 
 
 def _ensure():
@@ -21,12 +21,10 @@ def _log():
 
 def _default():
     return {
-        "status": "idle",
         "retry_count": 0,
         "total_failures_session": 0,
         "last_failure_ts": None,
         "last_failure_error": None,
-        "last_recovery_ts": None,
         "session_id": None,
     }
 
@@ -49,7 +47,6 @@ def save(s: dict):
 
 def record_failure(session_id: str, error: str) -> dict:
     s = load()
-    s["status"] = "retrying"
     s["retry_count"] = s.get("retry_count", 0) + 1
     s["total_failures_session"] = s.get("total_failures_session", 0) + 1
     s["last_failure_ts"] = time.time()
@@ -64,30 +61,6 @@ def record_failure(session_id: str, error: str) -> dict:
     }
     with open(_log(), "a") as f:
         f.write(json.dumps(entry) + "\n")
-    return s
-
-
-def record_recovery() -> dict:
-    s = load()
-    s["status"] = "recovered"
-    s["retry_count"] = 0
-    s["last_recovery_ts"] = time.time()
-    save(s)
-    return s
-
-
-def record_clean_stop(session_id: str) -> dict:
-    s = _default()
-    s["session_id"] = session_id
-    s["status"] = "idle"
-    save(s)
-    return s
-
-
-def record_gave_up() -> dict:
-    s = load()
-    s["status"] = "gave_up"
-    save(s)
     return s
 
 

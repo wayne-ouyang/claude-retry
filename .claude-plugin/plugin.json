@@ -1,0 +1,9 @@
+{
+  "name": "claude-retry",
+  "description": "Automatically retries on API errors via the Stop hook with exponential backoff.",
+  "version": "1.0.0",
+  "author": {
+    "name": "claude-retry",
+    "url": "https://github.com/wayne-ouyang/claude-retry"
+  }
+}

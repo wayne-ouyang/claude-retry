@@ -1,0 +1,23 @@
+{
+  "name": "claude-retry",
+  "owner": {
+    "name": "claude-retry"
+  },
+  "metadata": {
+    "description": "Automatically retries on API errors via the Stop hook with exponential backoff.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-retry",
+      "description": "Detects API errors in the session transcript and automatically retries by blocking the Stop event with exponential backoff. No wrapper script needed.",
+      "version": "1.0.0",
+      "author": {
+        "name": "claude-retry"
+      },
+      "source": "./",
+      "category": "utilities",
+      "keywords": ["retry", "api-error", "resilience", "stop-hook"]
+    }
+  ]
+}
