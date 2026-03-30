@@ -1,12 +1,12 @@
 {
   "hooks": {
-    "Stop": [
+    "StopFailure": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $CLAUDE_PLUGIN_DIR/scripts/on_stop.py",
-            "timeout": 15
+            "command": "python3 $CLAUDE_PLUGIN_DIR/scripts/on_stop_failure.py",
+            "timeout": 180
           }
         ]
       }

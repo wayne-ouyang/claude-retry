@@ -64,6 +64,14 @@ def record_failure(session_id: str, error: str) -> dict:
     return s
 
 
+def reset_retries(session_id: str) -> dict:
+    s = load()
+    s["retry_count"] = 0
+    s["session_id"] = session_id
+    save(s)
+    return s
+
+
 def record_session_start(session_id: str) -> dict:
     s = _default()
     s["session_id"] = session_id
