@@ -16,9 +16,9 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(__file__))
 import state as st
 
-BASE_DELAY  = float(os.environ.get("CLAUDE_RETRY_DELAY",   "5"))
-BACKOFF     = float(os.environ.get("CLAUDE_RETRY_BACKOFF", "2"))
-MAX_DELAY   = float(os.environ.get("CLAUDE_RETRY_MAX_DELAY", "120"))
+BASE_DELAY = float(os.environ.get("CLAUDE_RETRY_DELAY", "5"))
+BACKOFF = float(os.environ.get("CLAUDE_RETRY_BACKOFF", "2"))
+MAX_DELAY = float(os.environ.get("CLAUDE_RETRY_MAX_DELAY", "120"))
 MAX_RETRIES = int(os.environ.get("CLAUDE_RETRY_MAX_RETRIES", "0"))  # 0 = 永远重试
 
 
@@ -31,10 +31,13 @@ def _find_claude_pid() -> int | None:
     pid = os.getpid()
     for _ in range(10):
         try:
-            ppid = int(subprocess.check_output(
-                ["ps", "-o", "ppid=", "-p", str(pid)],
-                text=True, stderr=subprocess.DEVNULL
-            ).strip())
+            ppid = int(
+                subprocess.check_output(
+                    ["ps", "-o", "ppid=", "-p", str(pid)],
+                    text=True,
+                    stderr=subprocess.DEVNULL,
+                ).strip()
+            )
         except Exception:
             break
         if ppid <= 1:
@@ -42,7 +45,8 @@ def _find_claude_pid() -> int | None:
         try:
             comm = subprocess.check_output(
                 ["ps", "-o", "comm=", "-p", str(ppid)],
-                text=True, stderr=subprocess.DEVNULL
+                text=True,
+                stderr=subprocess.DEVNULL,
             ).strip()
         except Exception:
             break
@@ -62,7 +66,8 @@ def _stdin_fd_path(pid: int) -> str | None:
     try:
         out = subprocess.check_output(
             ["lsof", "-a", "-p", str(pid), "-d", "0", "-Fn"],
-            text=True, stderr=subprocess.DEVNULL
+            text=True,
+            stderr=subprocess.DEVNULL,
         )
         for line in out.splitlines():
             if line.startswith("n"):
@@ -83,8 +88,11 @@ def _inject_enter() -> bool:
         if fd_path:
             try:
                 with open(fd_path, "wb") as f:
-                    f.write(b"\n")
-                print(f"[claude-retry] wrote \\n to {fd_path} (pid={claude_pid})", file=sys.stderr)
+                    f.write(b"1231")
+                print(
+                    f"[claude-retry] wrote \\n to {fd_path} (pid={claude_pid})",
+                    file=sys.stderr,
+                )
                 return True
             except Exception as e:
                 print(f"[claude-retry] write fd failed: {e}", file=sys.stderr)
@@ -96,7 +104,7 @@ def _inject_enter() -> bool:
         ).strip()
         if tty and tty != "not a tty" and Path(tty).exists():
             with open(tty, "wb") as f:
-                f.write(b"\n")
+                f.write(b"1231")
             print(f"[claude-retry] wrote \\n to tty {tty}", file=sys.stderr)
             return True
     except Exception as e:
@@ -110,7 +118,7 @@ def _inject_enter() -> bool:
         if tty and Path(tty).exists():
             TIOCSTI = 0x5412 if sys.platform != "darwin" else 0x80017472
             with open(tty, "rb") as f:
-                fcntl.ioctl(f, TIOCSTI, b"\n")
+                fcntl.ioctl(f, TIOCSTI, b"1231")
             print(f"[claude-retry] TIOCSTI → {tty}", file=sys.stderr)
             return True
     except Exception as e:
@@ -125,10 +133,10 @@ def main():
     except Exception:
         data = {}
 
-    session_id   = data.get("session_id", "unknown")
-    error        = data.get("error", "unknown")
+    session_id = data.get("session_id", "unknown")
+    error = data.get("error", "unknown")
     error_detail = data.get("error_details", "")
-    full_error   = f"{error}: {error_detail}" if error_detail else error
+    full_error = f"{error}: {error_detail}" if error_detail else error
 
     new_state = st.record_failure(session_id, full_error)
     retry_num = new_state["retry_count"]
