@@ -4,7 +4,6 @@ claude-retry — StopFailure hook
 """
 import json
 import os
-import shlex
 import subprocess
 import sys
 import time
@@ -16,9 +15,9 @@ BASE_DELAY = float(os.environ.get("CLAUDE_RETRY_DELAY", "5"))
 BACKOFF = float(os.environ.get("CLAUDE_RETRY_BACKOFF", "2"))
 MAX_DELAY = float(os.environ.get("CLAUDE_RETRY_MAX_DELAY", "120"))
 MAX_RETRIES = int(os.environ.get("CLAUDE_RETRY_MAX_RETRIES", "0"))
-SEND_KEYS_TEMPLATE = os.environ.get(
-    "CLAUDE_RETRY_SEND_KEYS",
-    "Up Enter",
+INJECT_COMMAND_TEMPLATE = os.environ.get(
+    "CLAUDE_RETRY_INJECT_COMMAND",
+    "tmux send-keys -t {pane_id} Up && sleep 0.2 && tmux send-keys -t {pane_id} Enter",
 )
 
 
@@ -33,23 +32,21 @@ def _backoff(attempt: int) -> float:
 
 def _inject_retry() -> bool:
     """
-    仅执行 tmux send-keys，允许自定义其参数。
-    默认等价于: tmux send-keys -t <current-pane> retry Enter
+    执行可配置的重试注入命令。
+    默认等价于:
+    tmux send-keys -t <current-pane> Up && sleep 0.2 && tmux send-keys -t <current-pane> Enter
     """
     try:
         pane_id = subprocess.check_output(
             ["tmux", "display-message", "-p", "#{pane_id}"],
             text=True,
         ).strip()
-        send_keys_args = shlex.split(SEND_KEYS_TEMPLATE)
-        subprocess.run(
-            ["tmux", "send-keys", "-t", pane_id, *send_keys_args],
-            check=True,
-        )
-        st.log(f"tmux send-keys -> pane {pane_id}: {send_keys_args!r} ✓")
+        inject_command = INJECT_COMMAND_TEMPLATE.format(pane_id=pane_id)
+        subprocess.run(inject_command, shell=True, check=True)
+        st.log(f"inject command -> pane {pane_id}: {inject_command!r} ✓")
         return True
     except Exception as e:
-        st.log(f"tmux send-keys failed: {e}")
+        st.log(f"inject command failed: {e}")
     return False
 
 

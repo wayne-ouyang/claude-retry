@@ -2,9 +2,9 @@
 
 A Claude Code plugin that automatically retries on API errors with exponential backoff.
 
-No wrapper script needed — hooks directly into Claude Code's event system. When Claude Code hits an API error (overloaded, rate limit, network timeout, etc.), this plugin catches the failure, waits with exponential backoff, and runs `tmux send-keys` to resume the conversation automatically. You walk away, and it keeps going.
+No wrapper script needed — hooks directly into Claude Code's event system. When Claude Code hits an API error (overloaded, rate limit, network timeout, etc.), this plugin catches the failure, waits with exponential backoff, and runs a configurable command to resume the conversation automatically. You walk away, and it keeps going.
 
-> **Requires tmux** — the plugin runs configurable `tmux send-keys` arguments in the current pane. Claude Code must be running inside a tmux session.
+> **Requires tmux** — the default retry injection command targets the current tmux pane. Claude Code must be running inside a tmux session.
 
 ## Setup
 
@@ -67,7 +67,7 @@ To uninstall:
 The plugin registers two hooks:
 
 1. **SessionStart** — resets retry counters when a new session begins
-2. **StopFailure** — on API failure, records the error, sleeps with exponential backoff, then runs `tmux send-keys` to trigger a retry
+2. **StopFailure** — on API failure, records the error, sleeps with exponential backoff, then runs a configurable inject command to trigger a retry
 
 State is persisted to `~/.claude/claude-retry/state.json`, and failures are logged to `failures.jsonl` in the same directory.
 
@@ -81,13 +81,13 @@ State is persisted to `~/.claude/claude-retry/state.json`, and failures are logg
 
 All settings are optional environment variables. Add them to your shell profile (e.g. `~/.zshrc`) to persist:
 
-| Variable                   | Default    | Description                                                |
-| -------------------------- | ---------- | ---------------------------------------------------------- |
-| `CLAUDE_RETRY_DELAY`       | `5`        | Base delay in seconds                                      |
-| `CLAUDE_RETRY_BACKOFF`     | `2`        | Backoff multiplier                                         |
-| `CLAUDE_RETRY_MAX_DELAY`   | `120`      | Maximum delay cap in seconds                               |
-| `CLAUDE_RETRY_MAX_RETRIES` | `0`        | Max retries before giving up (0 = unlimited)               |
-| `CLAUDE_RETRY_SEND_KEYS`   | `Up Enter` | Arguments passed to `tmux send-keys` after the pane target |
+| Variable                      | Default                                                                            | Description                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `CLAUDE_RETRY_DELAY`          | `5`                                                                                | Base delay in seconds                                             |
+| `CLAUDE_RETRY_BACKOFF`        | `2`                                                                                | Backoff multiplier                                                |
+| `CLAUDE_RETRY_MAX_DELAY`      | `120`                                                                              | Maximum delay cap in seconds                                      |
+| `CLAUDE_RETRY_MAX_RETRIES`    | `0`                                                                                | Max retries before giving up (0 = unlimited)                      |
+| `CLAUDE_RETRY_INJECT_COMMAND` | `tmux send-keys -t {pane_id} Up && sleep 0.2 && tmux send-keys -t {pane_id} Enter` | Full command template used to trigger retry; supports `{pane_id}` |
 
 Example:
 
@@ -95,7 +95,7 @@ Example:
 export CLAUDE_RETRY_DELAY=10
 export CLAUDE_RETRY_MAX_DELAY=60
 export CLAUDE_RETRY_MAX_RETRIES=5
-export CLAUDE_RETRY_SEND_KEYS="Up Enter"
+export CLAUDE_RETRY_INJECT_COMMAND="tmux send-keys -t {pane_id} Up && sleep 0.2 && tmux send-keys -t {pane_id} Enter"
 ```
 
 ## License
