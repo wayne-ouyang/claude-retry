@@ -21,7 +21,10 @@ sudo apt install tmux
 Then start a tmux session and launch Claude inside it:
 
 ```bash
-tmux new -s claude
+# start a tmux session
+tmux
+
+# run claude code
 claude
 ```
 
