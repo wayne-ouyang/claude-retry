@@ -11,10 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Two hook handlers plus shared state:
 
 - **SessionStart** (`scripts/on_session_start.py`) — resets retry counters
-- **StopFailure** (`scripts/on_stop_failure.py`) — records failure, sleeps with exponential backoff, injects `\n` into Claude's stdin to trigger retry
+- **StopFailure** (`scripts/on_stop_failure.py`) — records failure, sleeps with exponential backoff, then runs `tmux send-keys` with configurable arguments to trigger retry
 - **State** (`scripts/state.py`) — persists to `~/.claude/claude-retry/state.json`, logs failures to `failures.jsonl`
-
-The enter-injection tries three methods in order: write to Claude PID's fd/0 (found via process tree + lsof), write to TTY, TIOCSTI ioctl.
 
 ### Config (env vars)
 
@@ -22,6 +20,7 @@ The enter-injection tries three methods in order: write to Claude PID's fd/0 (fo
 - `CLAUDE_RETRY_BACKOFF` — multiplier (default: 2)
 - `CLAUDE_RETRY_MAX_DELAY` — cap seconds (default: 120)
 - `CLAUDE_RETRY_MAX_RETRIES` — max before reset (default: 0 = unlimited)
+- `CLAUDE_RETRY_SEND_KEYS` — arguments for `tmux send-keys` after the internally added target pane (default: `retry Enter`)
 
 ### Plugin Registration
 
