@@ -18,6 +18,18 @@ brew install tmux
 sudo apt install tmux
 ```
 
+Enable mouse support (for scroll wheel, click to select pane, etc.):
+
+```bash
+tmux set -g mouse on
+```
+
+Or add it to `~/.tmux.conf` to persist across sessions:
+
+```bash
+echo 'set -g mouse on' >> ~/.tmux.conf
+```
+
 Then start a tmux session and launch Claude inside it:
 
 ```bash
